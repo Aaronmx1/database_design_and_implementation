@@ -5,11 +5,28 @@ import java.nio.charset.*;
 import java.util.Date;     // AM: For Date objects
 
 /**
+ * AM - Hybrid personal & AI write-up architecture
+ * The Page class is the "Data Translator."
+ * It abstracts the complexity of raw binary data into usable Java types.
+ * * ARCHITECTURE OVERVIEW:
+ * * 1. THE WRAPPER (Bytes <-> Types)
+ * - Disk files are just streams of bytes. Java uses Integers, Strings, and Dates.
+ * - Page wraps a standard Java ByteBuffer and provides methods (getInt, setString)
+ * to convert between these formats.
+ * * 2. THE MEMORY BLOCK
+ * - A Page represents exactly one "Block" of data (e.g., 4KB) in RAM.
+ * - The contents() method exposes the underlying ByteBuffer for direct I/O 
+ * operations by the FileMgr.
+ * * 3. SAFETY & BOUNDARIES
+ * - It prevents buffer overflows by checking offsets against the page capacity.
+ * - It handles string encoding (ASCII/UTF-8) to ensure text is stored consistently.
+ */
+
+/**
  * AM: Cursor movement related to the ByteBuffer
  *       Absolute operation -> like setInt(offset, n) DON'T move the cursor and instead point to a specific point and start retrieving data
  *       Relative operation -> like getInt() and get(b) DO move the cursor and allows for seqeuentially reading data
  */
-
 public class Page {
    private ByteBuffer bb;
    public static Charset CHARSET = StandardCharsets.US_ASCII;

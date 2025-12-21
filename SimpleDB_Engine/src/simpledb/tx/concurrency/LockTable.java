@@ -89,23 +89,6 @@ class LockTable {
     * then an exception is thrown.
     * @param blk a reference to the disk block
     */
-   /*
-   // AM: Exercise 5.53 - Not added, only commented out
-   public synchronized void sLock(BlockId blk) {
-      try {
-         long timestamp = System.currentTimeMillis();
-         while (hasXlock(blk) && !waitingTooLong(timestamp))
-            wait(MAX_TIME);
-         if (hasXlock(blk))
-            throw new LockAbortException();
-         int val = getLockVal(blk);  // will not be negative
-         locks.put(blk, val+1);        // AM: Grant lock by incrementing count
-      }
-      catch(InterruptedException e) {
-         throw new LockAbortException();
-      }
-   }
-   */
   public void sLock(BlockId blk){
       BlockLock blkLock;
 
@@ -150,22 +133,7 @@ class LockTable {
     * then an exception is thrown.
     * @param blk a reference to the disk block
     */
-   /*
-   // AM: Exercise 5.53 - Not added, only commented out
-   synchronized void xLock(BlockId blk) {
-      try {
-         long timestamp = System.currentTimeMillis();
-         while (hasOtherSLocks(blk) && !waitingTooLong(timestamp))
-            wait(MAX_TIME);
-         if (hasOtherSLocks(blk))
-            throw new LockAbortException();
-         locks.put(blk, -1);
-      }
-      catch(InterruptedException e) {
-         throw new LockAbortException();
-      }
-   }
-   */
+   // AM: Exercise 5.53
    public void xLock(BlockId blk){
       BlockLock blkLock;
 
@@ -206,17 +174,7 @@ class LockTable {
     * then the waiting transactions are notified.
     * @param blk a reference to the disk block
     */
-   /* Exercise 5.53 - Not added, only commented out
-   synchronized void unlock(BlockId blk) {
-      int val = getLockVal(blk);
-      if (val > 1)
-         locks.put(blk, val-1);
-      else {
-         locks.remove(blk);
-         notifyAll();
-      }
-   }
-   */
+   // AM: Exercise 5.53
    public void unlock(BlockId blk){
       BlockLock blkLock;
 
@@ -244,19 +202,4 @@ class LockTable {
    private boolean waitingTooLong(long starttime) {
       return System.currentTimeMillis() - starttime > MAX_TIME;
    }
-   
-   /* // AM: Exercise 5.53 - Not added, only commented out
-   private boolean hasXlock(BlockId blk) {
-      return getLockVal(blk) < 0;
-   }
-   
-   private boolean hasOtherSLocks(BlockId blk) {
-      return getLockVal(blk) > 1;
-   }
-      
-   private int getLockVal(BlockId blk) {
-      Integer ival = locks.get(blk);
-      return (ival == null) ? 0 : ival.intValue();
-   }
-   */
 }

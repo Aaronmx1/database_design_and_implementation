@@ -10,6 +10,7 @@ import java.util.*; // AM: imports the Map algorithm
  * @author Edward Sciore
  *
  */
+
 /**
  * AM - Hybrid personal & AI write-up architecture
  * The BufferMgr class manages the "Buffer Pool," a fixed-size cache in RAM.
@@ -46,15 +47,6 @@ public class BufferMgr {
     * {@link simpledb.log.LogMgr LogMgr} object.
     * 
     * @param numbuffs the number of buffer slots to allocate
-    */
-   /*
-    * AM: Exercise 4.11 - Not added, only commented out
-    * public BufferMgr(FileMgr fm, LogMgr lm, int numbuffs) {
-    * bufferpool = new Buffer[numbuffs];
-    * numAvailable = numbuffs;
-    * for (int i=0; i<numbuffs; i++)
-    * bufferpool[i] = new Buffer(fm, lm);
-    * }
     */
    public BufferMgr(FileMgr fm, LogMgr lm, int numbuffs) {
       bufferpool = new Buffer[numbuffs];
@@ -138,22 +130,6 @@ public class BufferMgr {
     * @param blk a reference to a disk block
     * @return the pinned buffer
     */
-   /*
-    * AM: Exercise 4.11 - Not added, only commented out
-    * private Buffer tryToPin(BlockId blk) {
-    * Buffer buff = findExistingBuffer(blk);
-    * if (buff == null) {
-    * buff = chooseUnpinnedBuffer();
-    * if (buff == null)
-    * return null;
-    * buff.assignToBlock(blk);
-    * }
-    * if (!buff.isPinned())
-    * numAvailable--;
-    * buff.pin();
-    * return buff;
-    * }
-    */
    private Buffer tryToPin(BlockId blk) {
       Buffer buff = findExistingBuffer(blk);
       if (buff == null) {
@@ -181,31 +157,11 @@ public class BufferMgr {
       return buff;
    }
 
-   /*
-    * AM: Exercise 4.11 - Not added, only commented out
-    * private Buffer findExistingBuffer(BlockId blk) {
-    * for (Buffer buff : bufferpool) {
-    * BlockId b = buff.block();
-    * if (b != null && b.equals(blk))
-    * return buff;
-    * }
-    * return null;
-    * }
-    */
    private Buffer findExistingBuffer(BlockId blk) {
       // AM: O(1) lookup instead of O(N) lookup
       return bufferMap.get(blk); // AM: Returns null if no Buffer matching blk found
    }
 
-   /*
-    * AM: Exercise 4.11 - Not added, only commented out
-    * private Buffer chooseUnpinnedBuffer() {
-    * for (Buffer buff : bufferpool)
-    * if (!buff.isPinned())
-    * return buff;
-    * return null;
-    * }
-    */
    private Buffer chooseUnpinnedBuffer() {
       // AM: 1. Check every Buffer once (up to numbuffs times)
       for (int i = 0; i < bufferpool.length; i++) {

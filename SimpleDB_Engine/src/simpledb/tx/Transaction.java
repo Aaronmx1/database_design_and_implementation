@@ -50,7 +50,6 @@ import java.util.*;     // AM: Loads in HashMap class
  * @author Edward Sciore
  */
 public class Transaction {
-   //private static int nextTxNum = 0;
    private static final int END_OF_FILE = -1;   // AM: Creates a logical lock for a BlockId
    private RecoveryMgr    recoveryMgr;
    private ConcurrencyMgr concurMgr;
@@ -105,14 +104,7 @@ public class Transaction {
     * write and flush a rollback record to the log,
     * release all locks, and unpin any pinned buffers.
     */
-   /*     AM: Exercise 5.48 - Not added, only commented out
-   public void rollback() {
-      recoveryMgr.rollback();
-      System.out.println("transaction " + txnum + " rolled back");
-      concurMgr.release();
-      mybuffers.unpinAll();
-   }
-   */
+   // AM: Exercise 5.48
    public void rollback(){
       recoveryMgr.rollback();
       System.out.println("transaction " + txnum + " rolled back");
@@ -146,11 +138,7 @@ public class Transaction {
     * The transaction manages the buffer for the client.
     * @param blk a reference to the disk block
     */
-   /* AM: Exercise 4.11 - Not added, only commented out
-   public void pin(BlockId blk) {
-      mybuffers.pin(blk);
-   }
-   */
+  // AM: Exercise 4.11
   public void pin(BlockId blk){
       concurMgr.sLock(blk);      // AM: Added to lock block when block is pinned   
       mybuffers.pin(blk);
@@ -175,14 +163,8 @@ public class Transaction {
     * @param offset the byte offset within the block
     * @return the integer stored at that offset
     */
-   /* AM: Exercise 4.11 - Not added, only commented out
-   public int getInt(BlockId blk, int offset) {
-      concurMgr.sLock(blk);
-      Buffer buff = mybuffers.getBuffer(blk);
-      return buff.contents().getInt(offset);
-   }
-   */
-  // AM: Moved S-Lock process to when block is pinned.
+  // AM: Exercise 4.11
+  //     Moved S-Lock process to when block is pinned.
   public int getInt(BlockId blk, int offset){
       Buffer buff = mybuffers.getBuffer(blk);
       return buff.contents().getInt(offset);
@@ -197,14 +179,8 @@ public class Transaction {
     * @param offset the byte offset within the block
     * @return the string stored at that offset
     */
-   /* AM: Exercise 4.11 - Not added, only commented out
-   public String getString(BlockId blk, int offset) {
-      concurMgr.sLock(blk);
-      Buffer buff = mybuffers.getBuffer(blk);
-      return buff.contents().getString(offset);
-   }
-   */
-  // AM: Moved S-Lock process to when block is pinned.
+  // AM: Exercise 4.11
+  //     Moved S-Lock process to when block is pinned.
   public String getString(BlockId blk, int offset){
       Buffer buff = mybuffers.getBuffer(blk);
       return buff.contents().getString(offset);
@@ -280,13 +256,7 @@ public class Transaction {
     * @param filename the name of the file
     * @return a reference to the newly-created disk block
     */
-   /*    AM: Exercise 5.48 - Not added, only commented out
-   public BlockId append(String filename) {
-      BlockId dummyblk = new BlockId(filename, END_OF_FILE);
-      concurMgr.xLock(dummyblk);       // AM: Obtains exclusive lock on "End of File"
-      return fm.append(filename);
-   }
-   */
+   // AM: Exercise 5.48
    public BlockId append(String filename){
       BlockId dummyblk = new BlockId(filename, END_OF_FILE);
       concurMgr.xLock(dummyblk);
@@ -308,13 +278,7 @@ public class Transaction {
       return bm.available();
    }
 
-   /* 
-   // AM: Exercise 5.50 - Not added, only commented out
-   private static synchronized int nextTxNumber() {
-      nextTxNum++;
-      return nextTxNum;
-   }
-   */
+   // AM: Exercise 5.50
    private static synchronized int nextTxNumber(FileMgr fm){
       // AM: 1. Prepare the specific block where we store the sequence
       BlockId blk = new BlockId("txn_seq", 0);

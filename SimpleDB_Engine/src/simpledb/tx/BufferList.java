@@ -8,6 +8,26 @@ import simpledb.buffer.*;
  * Manage the transaction's currently-pinned buffers. 
  * @author Edward Sciore
  */
+
+/**
+ * AM - Hybrid personal & AI write-up architecture 
+ * The BufferList class is the "Bookkeeper" for a single Transaction.
+ * It tracks which buffers are currently pinned by *this specific* transaction.
+ * * ARCHITECTURE OVERVIEW:
+ * * 1. THE PRIVATE TRACKER (The "Backpack")
+ * - The global BufferMgr manages the pool, but it doesn't know which transaction
+ * "owns" which pin.
+ * - BufferList maintains a private Map<BlockId, Buffer> for the transaction.
+ * * 2. AUTOMATIC CLEANUP (Resource Management)
+ * - When a Transaction commits or rolls back, it must release ALL its pins.
+ * - Instead of the programmer manually calling unpin() for every single block read,
+ * the Transaction simply calls unpinAll().
+ * - BufferList iterates through its private list and releases everything back 
+ * to the global BufferMgr.
+ * * 3. CACHE OPTIMIZATION
+ * - If a transaction asks for Block 5 twice, BufferList sees it's already in the
+ * private map and returns it immediately, avoiding a redundant call to the global BufferMgr.
+ */
 class BufferList {
    private Map<BlockId,Buffer> buffers = new HashMap<>();  // AM: Tracks Buffers in use by a Transaction
    private List<BlockId> pins = new ArrayList<>();         // AM: Tracks list of pinned Blocks

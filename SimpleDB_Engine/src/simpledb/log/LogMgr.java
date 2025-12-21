@@ -55,19 +55,12 @@ public class LogMgr {
    public LogMgr(FileMgr fm, String logfile) {
       this.fm = fm;
       this.logfile = logfile;
-      /* AM: Exercise 4.11 - Not added, only commented out
-      byte[] b = new byte[fm.blockSize()];   // AM: Creates an empty staging area in RAM.
-      logpage = new Page(b);                 // AM: Wraps the byte array in a bytebuffer so we can easily write integers & strings to it.
-      */
 
       int logsize = fm.length(logfile);
       if (logsize == 0)
          currentblk = appendNewBlock();
       else {
          currentblk = new BlockId(logfile, logsize-1);
-         /* AM: Exercise 4.11 - Not added, only commented out
-         //fm.read(currentblk, logpage);
-         */
       }
    }
 
@@ -90,12 +83,6 @@ public class LogMgr {
          flush();
    }
 
-   /* AM: 4.12 Exercise - Commented out to implement new version
-   public Iterator<byte[]> iterator() {
-      flush();                               // AM: Flush Log Buffer to Disk
-      return new LogIterator(fm, currentblk);// AM: Allocates a fresh empty Page to pull data from Disk
-   }
-   */
    public Iterator<byte[]> iterator(){
       flush();
       return new LogIterator(fm, currentblk, bm);
@@ -113,24 +100,7 @@ public class LogMgr {
     * @param logrec a byte buffer containing the bytes.
     * @return the LSN of the final value
     */
-   public synchronized int append(byte[] logrec) {
-      /* AM: Exercise 4.11 - Not added, only commented out
-      int boundary = logpage.getInt(0);
-      int recsize = logrec.length;
-      int bytesneeded = recsize + Integer.BYTES;
-      if (boundary - bytesneeded < Integer.BYTES) { // the log record doesn't fit,
-         flush();        // so move to the next block.
-         currentblk = appendNewBlock();
-         boundary = logpage.getInt(0);
-      }
-      int recpos = boundary - bytesneeded;   // AM: store record position
-
-      logpage.setBytes(recpos, logrec);
-      logpage.setInt(0, recpos); // the new boundary
-      latestLSN += 1;
-      return latestLSN;
-      */
-      
+   public synchronized int append(byte[] logrec) {      
       /* AM: Exercise 4.11 */
       // AM: 1. Access the Page via the Buffer
       Page p = logBuffer.contents();       // AM: Return reference to Log's Buffer Page
@@ -177,14 +147,6 @@ public class LogMgr {
    /**
     * Initialize the bytebuffer and append it to the log file.
     */
-   /* AM: Exercise 4.11 - Not added, only commented out
-   private BlockId appendNewBlock() {
-      BlockId blk = fm.append(logfile);     
-      logpage.setInt(0, fm.blockSize());
-      fm.write(blk, logpage);
-      return blk;
-   }
-   */
   /**
    * AM: Update the Page via the Buffer.
    *     If Block is full then a new Block will be created to handle Block and written to Disk.
@@ -202,16 +164,10 @@ public class LogMgr {
 
    /**
     * Write the buffer to the log file.
-    */
-   /* AM: Exercise 4.11 - Not added, only commented out
-   private void flush() {
-      fm.write(currentblk, logpage);
-      lastSavedLSN = latestLSN;
-   }
    */
   /* AM: Flush the Buffer to disk immediately.
    *     Use the FileMgr directly to avoid circular dependency logic in Buffer.flush()
-  */ 
+   */ 
   private void flush(){
       fm.write(currentblk, logBuffer.contents());  // AM: Flush Log Buffer Block to Disk
       lastSavedLSN = latestLSN;     // AM: Update Log Sequence Number to most recent flushed LSN.

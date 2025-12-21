@@ -1,6 +1,8 @@
 package simpledb.buffer;
 
-import simpledb.file.*;
+import simpledb.file.BlockId;
+import simpledb.file.FileMgr;
+import simpledb.file.Page;
 import simpledb.log.LogMgr;
 
 /**
@@ -14,7 +16,23 @@ import simpledb.log.LogMgr;
  */
 
 /**
- * AM: Buffer wraps both Page and BlockId objects. Page is the raw memory container.
+ * AM - Hybrid personal & AI write-up architecture 
+ * The Buffer class is the "Unit of Management" for memory.
+ * While a Page holds the raw data, a Buffer holds the *metadata* about that data.
+ * * ARCHITECTURE OVERVIEW:
+ * * 1. THE CONTAINER (Data + State)
+ * - It wraps a raw 'Page' object (contents) but adds critical status info:
+ * - Which disk block is this? (BlockId)
+ * - Is it currently in use? (pins)
+ * - Has it been modified? (txnum, lsn)
+ * * 2. THE GATEKEEPER (Traffic Logic)
+ * - It bridges the gap between the Memory layer and the Disk layer.
+ * - assignToBlock(): Loads data from FileMgr into memory.
+ * - flush(): Saves data from memory to FileMgr.
+ * * 3. WAL ENFORCEMENT (Durability)
+ * - Before flushing dirty data to disk, the Buffer checks the Log Sequence Number (LSN).
+ * - It ensures that the LogMgr has saved the corresponding log record before the Page writes its data. This guarantees that we never have "orphaned" updates
+ * on disk without a log history.
  */
 
 public class Buffer {
