@@ -9,7 +9,7 @@ import simpledb.tx.concurrency.ConcurrencyMgr;
 import java.util.*;     // AM: Loads in HashMap class
 
 /**
- * AM - Hybrid personal & AI write-up LockTable architecture 
+ * AM - Hybrid personal & AI write-up architecture 
  * The Transaction class is the "Hub" that manages the lifecycle of a user's interaction
  * with the database. It coordinates the ACID properties by delegating tasks to specific
  * sub-managers.

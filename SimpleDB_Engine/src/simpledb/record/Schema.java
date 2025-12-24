@@ -11,6 +11,25 @@ import java.util.*;
  * @author Edward Sciore
  *
  */
+/**
+ * AM - Hybrid personal & AI write-up architecture 
+ * The Schema class acts as the "Blueprint" for a database table.
+ * It defines the logical structure of data without worrying about physical storage.
+ * * ARCHITECTURE OVERVIEW:
+ * * 1. THE LOGICAL DEFINITION
+ * - It maintains the list of attributes (field names) and their characteristics
+ * (type and logical length).
+ * - Analogy: It acts like a table header definition (e.g., "Name: String(10), Age: Int").
+ * - It does NOT know about bytes, blocks, or disk offsets. It only cares about
+ * the "What", not the "Where".
+ * * 2. TYPE MANAGEMENT
+ * - Supports primitives like INTEGER and VARCHAR.
+ * - Stores metadata required for higher layers to validate data types before execution.
+ * * 3. INDEPENDENCE
+ * - A single Schema object can be shared across multiple blocks or files.
+ * - It serves as the input for the Layout class, which will eventually translate
+ * these logical definitions into physical requirements.
+ */
 public class Schema {
    private List<String> fields = new ArrayList<>();
    private Map<String,FieldInfo> info = new HashMap<>();

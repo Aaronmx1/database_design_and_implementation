@@ -8,6 +8,25 @@ import simpledb.tx.Transaction;
  * Store a record at a given location in a block. 
  * @author Edward Sciore
  */
+/**
+ * AM - Hybrid personal & AI write-up architecture 
+ * The RecordPage class acts as the "Carpenter" or "Manager" for a specific disk block.
+ * It applies the Layout structure to a physical block of memory to manage data.
+ * * ARCHITECTURE OVERVIEW:
+ * * 1. THE DATA MANAGER
+ * - While Page.java manages raw bytes, RecordPage manages "Records."
+ * - It interacts with the Transaction to read/write values, ensuring all ACID
+ * protections (Locking, Logging) are respected during data entry.
+ * * 2. LIFECYCLE MANAGEMENT (The Flag System)
+ * - format(): Initializes a new raw block by setting all slot flags to EMPTY.
+ * - insertAfter(): Scans the block for the first slot with an EMPTY flag,
+ * changes it to USED, and returns the ID.
+ * - delete(): Performs "Logical Deletion" by simply flipping a flag from USED
+ * to EMPTY, without erasing the actual byte data.
+ * * 3. ITERATION SUPPORT
+ * - nextAfter(): Allows higher-level classes (like TableScan) to scroll through
+ * the block, automatically skipping over EMPTY (deleted) slots to find valid data.
+ */
 public class RecordPage {
    public static final int EMPTY = 0, USED = 1;
    private Transaction tx;
@@ -89,10 +108,12 @@ public class RecordPage {
       }
    }
 
+   // AM: Searches for existing (ie. USED) records in that slot
    public int nextAfter(int slot) {
       return searchAfter(slot, USED);
    }
  
+   // AM: Searches for EMPTY slots and returns slot position
    public int insertAfter(int slot) {
       int newslot = searchAfter(slot, EMPTY);
       if (newslot >= 0)
@@ -116,7 +137,7 @@ public class RecordPage {
    private int searchAfter(int slot, int flag) {
       slot++;
       while (isValidSlot(slot)) {
-         if (tx.getInt(blk, offset(slot)) == flag)
+         if (tx.getInt(blk, offset(slot)) == flag)    // AM: Compares transaction's flag with existing slot's flag
             return slot;
          slot++;
       }

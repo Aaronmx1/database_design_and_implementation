@@ -11,9 +11,28 @@ import simpledb.file.Page;
  * @author Edward Sciore
  *
  */
+/**
+ * AM - Hybrid personal & AI write-up architecture 
+ * The Layout class acts as the "Tape Measure" for the Record Manager.
+ * It translates the logical Schema into physical byte offsets within a disk block.
+ * * ARCHITECTURE OVERVIEW:
+ * * 1. THE PHYSICAL MAPPER
+ * - It takes the logical 'Schema' and calculates exactly how many bytes each
+ * field consumes (e.g., INTEGER = 4 bytes).
+ * - It determines the exact starting position (offset) of every field within a record.
+ * * 2. SLOT STRUCTURE ENFORCEMENT
+ * - It defines the "Slot": A fixed-size region of bytes capable of holding one record.
+ * - It automatically reserves space (Bytes 0-3) at the start of every slot for
+ * the "Empty/Used" status flag.
+ * - It calculates the total 'slotSize' (Record Data + Flag Overhead) to allow
+ * mathematical jumping from Record 0 to Record 1 (pos = slot * slotSize).
+ * * 3. THE BRIDGE
+ * - It bridges the gap between the Schema (which knows "Name") and the
+ * RecordPage (which needs "Byte 32").
+ */
 public class Layout {
    private Schema schema;
-   private Map<String,Integer> offsets;
+   private Map<String,Integer> offsets;      // AM: Maintains field name and it's length in bytes
    private int slotsize;
 
    /**
@@ -80,7 +99,7 @@ public class Layout {
       if (fldtype == INTEGER)
          return Integer.BYTES;
       else // fldtype == VARCHAR
-         return Page.maxLength(schema.length(fldname));
+         return Page.maxLength(schema.length(fldname));  // AM: INTEGER + Bytes for string objects
    }
 }
 
